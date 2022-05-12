@@ -1,0 +1,211 @@
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QLabel, QScrollArea, QVBoxLayout
+from PyQt5.QtCore import Qt, QSize
+#from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon, QImage, QPalette, QBrush, QPixmap, QMovie, QPixmap
+from PyQt5.QtWinExtras import QWinTaskbarButton,QWinTaskbarProgress
+import sys
+import ctypes
+import matplotlib as plt
+import time
+import matplotlib.cbook as cbook
+
+import segmentation
+
+myappid = 'mycompany.myproduct.subproduct.version' # arbitrary string
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
+global flag
+flag = 0
+class Ui_Form(object):
+    def setupUi(self, Form):
+        Form.setObjectName("Form")
+        Form.resize(1280, 720)
+
+        palette = QPalette()
+        palette.setBrush(QPalette.Background, QBrush(QPixmap("C:\\Users\\Danilo\\PycharmProjects\\CT_lungs\\123.png")))
+        form.setPalette(palette)
+        form.setWindowIcon(QIcon("C:\\Users\\Danilo\\PycharmProjects\\CT_lungs\\ct_lungs.png"))
+        #form.setWindowIcon(QIcon('123.png'))
+
+        app_icon = QtGui.QIcon()
+        app_icon.addFile('C:\\Users\\Danilo\\PycharmProjects\\CT_lungs\\ct_lungs.png', QtCore.QSize(16, 16))
+        app_icon.addFile('C:\\Users\\Danilo\\PycharmProjects\\CT_lungs\\ct_lungs.png', QtCore.QSize(24, 24))
+        app_icon.addFile('C:\\Users\\Danilo\\PycharmProjects\\CT_lungs\\ct_lungs.png', QtCore.QSize(32, 32))
+        app_icon.addFile('C:\\Users\\Danilo\\PycharmProjects\\CT_lungs\\ct_lungs.png', QtCore.QSize(48, 48))
+        app_icon.addFile('C:\\Users\\Danilo\\PycharmProjects\\CT_lungs\\ct_lungs.png', QtCore.QSize(256, 256))
+        app.setWindowIcon(app_icon)
+
+        self.input_nii = QtWidgets.QPushButtongit(Form)
+        self.input_nii.setGeometry(QtCore.QRect(225, 500, 300, 50))
+        self.input_nii.setStyleSheet("background-color:white;\n"
+                                      "color: black;\n"
+                                      "border-style: outset;\n"
+                                      "border-width:2px;\n"
+                                      "border-radius:10px;\n"
+                                      "border-color:black;\n"
+                                      "font:Gideon Roman 16px;\n"
+                                      "padding :6px;\n"
+                                      "min-width:10px;\n"
+                                      "\n"
+                                      "\n"
+                                      "")
+
+        self.segmentation_button = QtWidgets.QPushButton(Form)
+        self.segmentation_button.setGeometry(QtCore.QRect(750, 500, 300, 50))
+        self.segmentation_button.setStyleSheet("background-color:white;\n"
+                                      "color: black;\n"
+                                      "border-style: outset;\n"
+                                      "border-width:2px;\n"
+                                      "border-radius:10px;\n"
+                                      "border-color:black;\n"
+                                      "font:Gideon Roman 16px;\n"
+                                      "padding :6px;\n"
+                                      "min-width:10px;\n"
+                                      "\n"
+                                      "\n"
+                                      "")
+
+        #self.getInteger()
+        #self.getInteger.show()
+        self.scroll = QScrollArea()  # Scroll Area which contains the widgets, set as the centralWidget
+        self.widget = QWidget()  # Widget that contains the collection of Vertical Box
+        self.vbox = QVBoxLayout()  # The Vertical Box that contains the Horizontal
+
+        self.widget.setLayout(self.vbox)
+
+        # Scroll Area Properties
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setWidget(self.widget)
+
+        #self.setCentralWidget(self.scroll)
+
+
+
+
+        self.scroll.setGeometry(500, 100, 300, 300)
+        self.scroll.setWindowTitle('Scroll Area Demonstration')
+        self.scroll.show()
+
+
+        self.input_nii.setObjectName("pushButton")
+        self.segmentation_button.setObjectName("pushButton")
+        '''
+        self.scroll = QScrollArea()  # Scroll Area which contains the widgets, set as the centralWidget
+        self.widget = QWidget()  # Widget that contains the collection of Vertical Box
+        self.vbox = QVBoxLayout()  # The Vertical Box that contains the Horizontal Boxes of  labels and buttons
+
+        for i in range(1, 50):
+            object = QLabel("TextLabel")
+            self.vbox.addWidget(object)
+
+        self.widget.setLayout(self.vbox)
+
+        # Scroll Area Properties
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setWidget(self.widget)
+
+        self.setCentralWidget(self.scroll)
+
+        self.setGeometry(600, 100, 1000, 900)
+        self.setWindowTitle('Scroll Area Demonstration')
+        self.show()
+        '''
+        self.retranslateUi(Form)
+        QtCore.QMetaObject.connectSlotsByName(Form)
+
+    def retranslateUi(self, Form):
+        _translate = QtCore.QCoreApplication.translate
+        Form.setWindowTitle(_translate("Form", "CT_lungs"))
+        self.input_nii.setText(_translate("Form", "Загрузить .nii файл"))
+        self.segmentation_button.setText(_translate("Form", "Сегментация"))
+        self.input_nii.clicked.connect(self.pushButton_handler)
+        self.segmentation_button.clicked.connect(self.pushButton_segmentation)
+
+   # def getInteger(self):
+    #    i, okPressed = QInputDialog.getInt(self, "Get integer", "Percentage:", 28, 0, 100, 1)
+     #   if okPressed:
+      #      print(i)
+    def pushButton_handler(self):
+        #print("Button pressed")
+        #self.open_dialog_box()
+        print(self.open_dialog_box())
+
+    def open_dialog_box(self):
+        global nii_file
+        nii_file = ''  # для того, чтобы праивльно работала кнопка сегментации
+        filename = QFileDialog.getOpenFileName()
+        path = filename[0]
+        nii_file = path
+        print(nii_file)
+        return nii_file
+
+    def pushButton_segmentation(self):
+        #if nii_file != '':
+        print('Segmentation pressed')
+        #segmentation.predict(nii_file)
+        #self.output = output_window()
+
+        #self.scroll = QScrollArea()  # Scroll Area which contains the widgets, set as the centralWidget
+        #self.widget = QWidget()  # Widget that contains the collection of Vertical Box
+        #self.vbox = QVBoxLayout()  # The Vertical Box that contains the Horizontal
+
+        for slice in range(0, 249):
+            print("ok1")
+            path_to_segmentated = "C:\\Users\\Danilo\\PycharmProjects\\CT_lungs\\slicenums\\" + "slice" + str(slice)
+            print("ok2")
+
+            #object = QPixmap(path_to_segmentated)
+            plt.imshow(path_to_segmentated)
+            plt.show()
+            print("ok3")
+            #self.vbox.addWidget(object)
+            print("ok4")
+
+        #self.setCentralWidget(self.scroll)
+
+        '''
+        self.widget.setLayout(self.vbox)
+
+        # Scroll Area Properties
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setWidget(self.widget)
+
+        self.setCentralWidget(self.scroll)
+
+        self.setGeometry(500, 100, 300, 300)
+        self.setWindowTitle('Scroll Area Demonstration')
+        self.show()
+        '''
+
+            #time.sleep(60)
+            #segmentation.predict(self.open_dialog_box(self))
+
+class output_window(object):
+    def setupUi(self, Form):
+        Form.setObjectName("Form")
+        Form.resize(1280, 720)
+        form.setWindowIcon(QIcon("C:\\Users\\Danilo\\PycharmProjects\\CT_lungs\\ct_lungs.png"))
+        label = QLabel(self)
+        pixmap = QPixmap('test.png')
+        label.setPixmap(pixmap)
+
+
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+    form = QtWidgets.QWidget()
+    #form.setWindowIcon(QtGui.QIcon("C:\\Users\\Cherry\\PycharmProjects\\ct_test\\ct_lungs.png"))
+    ui = Ui_Form()
+    ui.setupUi(form)
+    form.show()
+    sys.exit(app.exec_())
+
+#ui2 = output_window()
+#ui2.setupUi(form)
+#form.show()
